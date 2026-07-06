@@ -1,0 +1,24 @@
+{
+    "imola": {
+        "country": "Italie",
+        "length_km": 4.909,
+        "corners": 19,
+        "description": "Circuit très technique avec peu de marge d'erreur.",
+        "tips": [
+            "Bien sortir de Tamburello.",
+            "Ne pas trop attaquer certains vibreurs.",
+            "Soigner les sorties d'Acque Minerali."
+        ]
+    },
+
+    "spa": {
+        "country": "Belgique",
+        "length_km": 7.004,
+        "corners": 20,
+        "description": "Circuit rapide avec de grands changements d'altitude.",
+        "tips": [
+            "Préserver la vitesse dans Eau Rouge.",
+            "Optimiser la traction en sortie de La Source."
+        ]
+    }
+}
