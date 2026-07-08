@@ -1,15 +1,22 @@
+from fastapi import responses
+
 from backend.brain.modules.general import greeting
 from backend.brain.modules.setup import setup
 from backend.brain.modules.telemetry import telemetry
 from backend.brain.modules import circuits
-
 from backend.brain.memory import set_memory, get_memory
-
+from backend.brain.parser import parse_message
 
 def route(message: str, user_id: str):
-
+    intent = parse_message(message)
     message = message.lower()
-    responses = []
+    responses = {
+    "circuit": None,
+    "setup": None,
+    "telemetry": None,
+    "general": None,
+}
+    
 
     # 🧠 Mémoire simple (ex: voiture)
     if "je roule en" in message:
@@ -19,25 +26,37 @@ def route(message: str, user_id: str):
 
     # Greeting
     if any(word in message for word in ["bonjour", "salut", "hello"]):
-        responses.append(greeting())
+        responses["general"] = greeting()
 
     # Setup
-    if any(word in message for word in ["setup", "réglage", "reglage"]):
-        car = get_memory(user_id, "car")
-        if car:
-            responses.append(f"Tu roules en {car}. Parlons setup.")
-        responses.append(setup())
+    # Setup intelligent (avec intent parser)
+    if intent["setup"]:
+        car = intent["car"] or get_memory(user_id, "car")
+        circuit = intent["circuit"]
+
+        if car and circuit:
+            return f"Setup {car} pour {circuit} : priorité stabilité et traction."
+
+        car_msg = f"Tu roules en {car}. " if car else ""
+        responses["setup"] = car_msg + setup()
 
     # Telemetry
     if any(word in message for word in ["telemetrie", "télémétrie"]):
-        responses.append(telemetry())
+        responses["telemetry"] = telemetry()
 
     # Circuits
     circuit_response = circuits.handle(message)
     if circuit_response:
-        responses.append(circuit_response)
+        responses["circuit"] = circuit_response
 
-    if not responses:
+    ordered = []
+
+    for key in ["circuit", "setup", "telemetry", "general"]:
+        if responses[key]:
+            ordered.append(responses[key])
+
+    if not ordered:
         return "Je n'ai pas encore appris ce sujet."
 
-    return "\n\n".join(responses)
+    return "\n\n".join(ordered)
+
